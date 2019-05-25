@@ -60,13 +60,15 @@ namespace SudokuKata
 			Console.WriteLine(string.Join("\n", board.Select(s => new string(s)).ToArray()));
 			#endregion
 
-			#region Prepare lookup structures that will be used in further execution
 			Console.WriteLine();
 			Console.WriteLine(new string('=', 80));
 			Console.WriteLine();
 
-			Dictionary<int, int> maskToOnesCount = new Dictionary<int, int>();
-			maskToOnesCount[0] = 0;
+			#region Prepare lookup structures that will be used in further execution
+			Dictionary<int, int> maskToOnesCount = new Dictionary<int, int>
+			{
+				[0] = 0
+			};
 			for (int i = 1; i < (1 << 9); i++)
 			{
 				int smaller = i >> 1;
@@ -77,8 +79,6 @@ namespace SudokuKata
 			Dictionary<int, int> singleBitToIndex = new Dictionary<int, int>();
 			for (int i = 0; i < 9; i++)
 				singleBitToIndex[1 << i] = i;
-
-			int allOnes = (1 << 9) - 1;
 			#endregion
 
 			bool changeMade = true;
@@ -86,35 +86,7 @@ namespace SudokuKata
 			{
 				changeMade = false;
 
-				#region Calculate candidates for current state of the board
-				int[] candidateMasks = new int[state.Length];
-
-				for (int i = 0; i < state.Length; i++)
-					if (state[i] == 0)
-					{
-
-						int row = i / 9;
-						int col = i % 9;
-						int blockRow = row / 3;
-						int blockCol = col / 3;
-
-						int colidingNumbers = 0;
-						for (int j = 0; j < 9; j++)
-						{
-							int rowSiblingIndex = 9 * row + j;
-							int colSiblingIndex = 9 * j + col;
-							int blockSiblingIndex = 9 * (blockRow * 3 + j / 3) + blockCol * 3 + j % 3;
-
-							int rowSiblingMask = 1 << (state[rowSiblingIndex] - 1);
-							int colSiblingMask = 1 << (state[colSiblingIndex] - 1);
-							int blockSiblingMask = 1 << (state[blockSiblingIndex] - 1);
-
-							colidingNumbers = colidingNumbers | rowSiblingMask | colSiblingMask | blockSiblingMask;
-						}
-
-						candidateMasks[i] = allOnes & ~colidingNumbers;
-					}
-				#endregion
+				int[] candidateMasks = CalculateCandidatesByState(state);
 
 				#region Build a collection (named cellGroups) which maps cell indices into distinct groups (rows/columns/blocks)
 				var rowsIndices = state
@@ -782,6 +754,43 @@ namespace SudokuKata
 					#endregion
 				}
 			}
+		}
+
+		/// <summary>
+		/// Calculate candidates for current state of the board
+		/// </summary>
+		private static int[] CalculateCandidatesByState(int[] state)
+		{
+			int[] candidateMasks = new int[state.Length];
+
+			int allOnes = (1 << 9) - 1;
+
+			for (int i = 0; i < state.Length; i++)
+				if (state[i] == 0)
+				{
+					int row = i / 9;
+					int col = i % 9;
+					int blockRow = row / 3;
+					int blockCol = col / 3;
+
+					int colidingNumbers = 0;
+					for (int j = 0; j < 9; j++)
+					{
+						int rowSiblingIndex = 9 * row + j;
+						int colSiblingIndex = 9 * j + col;
+						int blockSiblingIndex = 9 * (blockRow * 3 + j / 3) + blockCol * 3 + j % 3;
+
+						int rowSiblingMask = 1 << (state[rowSiblingIndex] - 1);
+						int colSiblingMask = 1 << (state[colSiblingIndex] - 1);
+						int blockSiblingMask = 1 << (state[blockSiblingIndex] - 1);
+
+						colidingNumbers = colidingNumbers | rowSiblingMask | colSiblingMask | blockSiblingMask;
+					}
+
+					candidateMasks[i] = allOnes & ~colidingNumbers;
+				}
+
+			return candidateMasks;
 		}
 
 		private static char[][] ConstructFullyPopulatedBoard(out Random rng, out Stack<int[]> stateStack)
