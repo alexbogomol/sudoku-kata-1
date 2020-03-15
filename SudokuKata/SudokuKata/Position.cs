@@ -9,11 +9,11 @@
 			Column = index % 9;
 		}
 
-		public int Discriminator { get; set; }
-		public string Description { get; set; }
-		public int Index { get; set; }
-		public int Row { get; set; }
-		public int Column { get; set; }
+		public int Discriminator { get; private set; }
+		public string Description { get; private set; }
+		public int Index { get; }
+		public int Row { get; }
+		public int Column { get; }
 
 		public static Position ByColumn(int index)
 		{

@@ -9,7 +9,9 @@ namespace SudokuKata
 	{
 		static void Play()
 		{
-			char[][] board = ConstructFullyPopulatedBoard(out var rng, out var stateStack);
+			Random rng = new Random();
+
+			char[][] board = ConstructFullyPopulatedBoard(rng, out Stack<int[]> stateStack);
 
 			#region Generate inital board from the completely solved one
 			// Board is solved at this point.
@@ -793,7 +795,7 @@ namespace SudokuKata
 			return candidateMasks;
 		}
 
-		private static char[][] ConstructFullyPopulatedBoard(out Random rng, out Stack<int[]> stateStack)
+		private static char[][] ConstructFullyPopulatedBoard(Random rng, out Stack<int[]> stateStack)
 		{
 			// Prepare empty board
 			string line = "+---+---+---+";
@@ -814,9 +816,6 @@ namespace SudokuKata
 				middle.ToCharArray(),
 				line.ToCharArray()
 			};
-
-			// Construct board to be solved
-			rng = new Random();
 
 			// Top element is current state of the board
 			stateStack = new Stack<int[]>();
