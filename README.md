@@ -1,3 +1,5 @@
+Related presentation by Zoran: [Refactoring a 1000-Line Method into Clean(er) Code](https://youtu.be/9S6qoFZiqCQ)
+
 # Sudoku Kata
 Coding practice demonstrating an awfully long method. Try to refactor this method.
 
